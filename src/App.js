@@ -86,22 +86,7 @@ class App extends React.Component {
             // SO IS STORING OUR SESSION DATA
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
-    }
-
-    //CREATE NEW SONG
-    createNewSong = () => {
-        //MAKE THE NEW SONG
-        let newSong = {
-            title: "Untitled",
-            artist: "Unknown",
-            youTubeId: "dQw4w9WgXcQ"
-        };
-
-        //CREATE A NEW LIST WITH THE CURRENT LIST OF SONGS + NEW SONG
-        let newSongList = this.state.currentList.songs.push(newSong);
-        this.setStateWithUpdatedList(this.state.currentList);
-    }
-    
+    }    
 
     // THIS FUNCTION BEGINS THE PROCESS OF DELETING A LIST.
     deleteList = (key) => {
@@ -316,7 +301,6 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
-                    createNewSongCallback={this.createNewSong}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
