@@ -19,7 +19,7 @@ body {
 
 #root {
   background-color: var(--swatch-primary);
-  font-family: serif;
+  font-family: 'Tangerine', serif;
   position: absolute;
   width: 80%;
   left: 10%;
@@ -109,13 +109,13 @@ body {
 }
 
 .list-card, .selected-list-card, .unselected-list-card {
-  font-size: 18pt;
+  font-size: 25pt;
   margin: 10px;
   padding: 20px;
   border-radius: 25px;
 }
 
-.unselected-list-card:hover {
+.unselected-list-card:hover, .selected-list-card:hover{
   cursor: pointer;
   background-color: var(--swatch-contrast);
   color:white;
@@ -154,16 +154,23 @@ body {
 }
 
 .playlister-song, .playlister-song-dragged-to { 
-  display:flex;
-  align-items: center;
-  font-size: 24pt;
   height:20%;
+  /*CSS TO CREATE THE CARD FOR EACH SONG*/
+  font-size: 30pt;
+  margin: 10px;
+  padding: 20px;
+  border-radius: 25px;
+  background-color: var(--swatch-complement);
+}
+
+.playlister-song:hover{
+  cursor: pointer;
+  background-color: var(--swatch-contrast);
 }
 
 input {
   font-size:20pt;
 }
-
 
 /* THIS STYLE SHEET MANAGES STYLE FOR OUR MODAL, i.e. DIALOG BOX */
 
