@@ -20,7 +20,6 @@ export default class EditToolbar extends React.Component {
                 id='add-song-button' 
                 value="+" 
                 className={addSongClass}
-                onClick={this.handleClick}
             />
             <input 
                 type="button" 
