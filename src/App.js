@@ -7,6 +7,8 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
+import AddSong_Transaction from './transactions/AddSong_Transaction';
+import DeleteSong_Transaction from './transactions/DeleteSong_Transaction';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -20,7 +22,6 @@ import PlaylistCards from './components/PlaylistCards.js';
 import SidebarHeading from './components/SidebarHeading.js';
 import SidebarList from './components/SidebarList.js';
 import Statusbar from './components/Statusbar.js';
-import AddSong_Transaction from './transactions/AddSong_Transaction';
 
 class App extends React.Component {
     constructor(props) {
@@ -41,7 +42,7 @@ class App extends React.Component {
             currentList : null,
             sessionData : loadedSessionData,
             songIndexMarkedForDeletion : null,
-            songIndexMarkedForEdit : null
+            songIndexMarkedForEdit : null,
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -95,17 +96,21 @@ class App extends React.Component {
     }    
 
     //CREATE NEW SONG
-    createNewSong = () => {
+    createNewSong = (index, song) => {
         if(this.state.currentList !=null){
-            //MAKE THE NEW SONG
-            let newSong = {
-                title: "Untitled",
-                artist: "Unknown",
-                youTubeId: "dQw4w9WgXcQ"
-            };
-
-            //CREATE A NEW LIST WITH THE CURRENT LIST OF SONGS + NEW SONG
-            let newSongList = this.state.currentList.songs.push(newSong);
+            let newSong = "";
+            if(index != null && song != null){
+                this.state.currentList.songs.splice(index, 0, song)
+            }else{
+                //MAKE THE NEW SONG
+                newSong = {
+                    title: "Untitled",
+                    artist: "Unknown",
+                    youTubeId: "dQw4w9WgXcQ"
+                };
+                //CREATE A NEW LIST WITH THE CURRENT LIST OF SONGS + NEW SONG
+                this.state.currentList.songs.push(newSong);
+            }
             this.setStateWithUpdatedList(this.state.currentList);
         }
     }
@@ -296,6 +301,7 @@ class App extends React.Component {
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
+
             this.tps.undoTransaction();
 
             // MAKE SURE THE LIST GETS PERMANENTLY UPDATED
@@ -305,6 +311,7 @@ class App extends React.Component {
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING A REDO
     redo = () => {
         if (this.tps.hasTransactionToRedo()) {
+
             this.tps.doTransaction();
 
             // MAKE SURE THE LIST GETS PERMANENTLY UPDATED
@@ -344,6 +351,12 @@ class App extends React.Component {
             //PROMPT THE USER
             this.showDeleteSongModal();
         });
+        return this.state.currentList.songs[index];
+    }
+
+    addDeleteSongTransaction = (index) => {
+        let transaction = new DeleteSong_Transaction(this, index);
+        this.tps.addTransaction(transaction);
     }
 
     showDeleteSongModal() {
@@ -474,7 +487,7 @@ class App extends React.Component {
                 <PlaylistCards
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction} 
-                    deleteSongCallback={this.markSongForDeletion}
+                    deleteSongCallback={this.addDeleteSongTransaction}
                     editSongCallback={this.markSongForEdit}
                 />
                 <Statusbar 

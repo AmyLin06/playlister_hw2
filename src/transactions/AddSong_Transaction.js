@@ -15,7 +15,7 @@ export default class AddSong_Transaction extends jsTPS_Transaction {
     }
 
     doTransaction() {
-        this.app.createNewSong();
+        this.app.createNewSong(null, null);
     }
     
     undoTransaction() {
