@@ -248,6 +248,15 @@ span {
   grid-row: 1 / 4;
 }
 
+#edit-modal-content > p{
+  display: inline;
+  font-size: 30px;
+}
+
+#edit-modal-content > input{
+  font-family: Tangerine, serif;
+}
+
 .modal-prompt {  
   font-size:28pt;
   font-weight: bold;

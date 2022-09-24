@@ -11,6 +11,7 @@ import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
 import DeleteSongModal from './components/DeleteSongModal.js';
+import EditSongModal from './components/EditSongModal.js';
 
 // THESE REACT COMPONENTS ARE IN OUR UI
 import Banner from './components/Banner.js';
@@ -39,6 +40,7 @@ class App extends React.Component {
             currentList : null,
             sessionData : loadedSessionData,
             songIndexMarkedForDeletion : null,
+            songIndexMarkedForEdit : null
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -359,6 +361,82 @@ class App extends React.Component {
         });
     }
 
+    markSongForEdit = (index) => {
+        this.setState(prevState => ({
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            currentList: prevState.currentList,
+            sessionData: prevState.sessionData,
+            songIndexMarkedForDeletion: prevState.songIndexMarkedForDeletion,
+            songIndexMarkedForEdit: index
+        }), () => {
+            //PROMPT THE USER
+            let editSong = this.state.currentList.songs[index];
+            document.getElementById('edit-song-title').value = editSong.title;
+            document.getElementById('edit-song-artist').value = editSong.artist;
+            document.getElementById('edit-song-youTubeId').value = editSong.youTubeId;
+            this.showEditSongModal();
+        });
+    }
+
+    editMarkedSong = () => {
+        let newTitle = document.getElementById('edit-song-title').value;
+        let newArtist = document.getElementById('edit-song-artist').value;
+        let newYouTubeId = document.getElementById('edit-song-youTubeId').value;
+        this.editSong(this.state.songIndexMarkedForEdit, newTitle, newArtist, newYouTubeId);
+        this.hideEditSongModal();
+
+        //CLEAR EDIT INPUT BOXS AFTER EDITING
+        document.getElementById('edit-song-title').value = "";
+        document.getElementById('edit-song-artist').value = "";
+        document.getElementById('edit-song-youTubeId').value = "";
+    }
+
+    editSong = (index, newTitle, newArtist, newYouTubeId) => {
+        let newSong = {
+            title: newTitle,
+            artist: newArtist,
+            youTubeId: newYouTubeId
+        }
+        this.state.currentList.songs.splice(index, 1, newSong);
+
+        //RESET SONG INDEX MARKED FOR EDIT
+        this.setState(prevState => ({
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            currentList : prevState.currentList,
+            sessionData : prevState.sessionData,
+            songIndexMarkedForDeletion: prevState.songIndexMarkedForDeletion,
+            songIndexMarkedForEdit : null
+        }), () => {
+            // UPDATING THE LIST IN PERMANENT STORAGE
+            // IS AN AFTER EFFECT
+            this.db.mutationUpdateList(this.state.currentList);
+        });
+    }
+
+    showEditSongModal() {
+        let modal = document.getElementById("edit-song-modal");
+        modal.classList.add("is-visible");
+    }
+
+    hideEditSongModal = () => {
+        let modal = document.getElementById("edit-song-modal");
+        modal.classList.remove("is-visible");
+
+        //RESET SONG INDEX MARKED FOR EDIT
+        this.setState(prevState => ({
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            currentList : prevState.currentList,
+            sessionData : prevState.sessionData,
+            songIndexMarkedForDeletion: prevState.songIndexMarkedForDeletion,
+            songIndexMarkedForEdit : null
+        }), () => {
+            // UPDATING THE LIST IN PERMANENT STORAGE
+            // IS AN AFTER EFFECT
+            this.db.mutationUpdateList(this.state.currentList);
+        });
+    }
+
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
@@ -391,6 +469,7 @@ class App extends React.Component {
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction} 
                     deleteSongCallback={this.markSongForDeletion}
+                    editSongCallback={this.markSongForEdit}
                 />
                 <Statusbar 
                     currentList={this.state.currentList} />
@@ -404,6 +483,10 @@ class App extends React.Component {
                     currentList={this.state.currentList !== null ? this.state.currentList : null}
                     deleteSongCallback={this.deleteMarkedSong}
                     hideDeleteSongModalCallback={this.hideDeleteSongModal}
+                />
+                <EditSongModal
+                    editSongCallback={this.editMarkedSong}
+                    hideEditSongModalCallback={this.hideEditSongModal} 
                 />
             </div>
         );
