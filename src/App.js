@@ -20,6 +20,7 @@ import PlaylistCards from './components/PlaylistCards.js';
 import SidebarHeading from './components/SidebarHeading.js';
 import SidebarList from './components/SidebarList.js';
 import Statusbar from './components/Statusbar.js';
+import AddSong_Transaction from './transactions/AddSong_Transaction';
 
 class App extends React.Component {
     constructor(props) {
@@ -107,6 +108,11 @@ class App extends React.Component {
             let newSongList = this.state.currentList.songs.push(newSong);
             this.setStateWithUpdatedList(this.state.currentList);
         }
+    }
+
+    addSongTransaction = () => {
+        let transaction = new AddSong_Transaction(this, this.state.currentList);
+        this.tps.addTransaction(transaction);
     }
 
     // THIS FUNCTION BEGINS THE PROCESS OF DELETING A LIST.
@@ -463,7 +469,7 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
-                    createNewSongCallback={this.createNewSong}
+                    createNewSongCallback={this.addSongTransaction}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
