@@ -154,7 +154,7 @@ body {
 }
 
 .playlister-song, .playlister-song-dragged-to { 
-  height:20%;
+  
   /*CSS TO CREATE THE CARD FOR EACH SONG*/
   font-size: 30pt;
   margin: 10px;

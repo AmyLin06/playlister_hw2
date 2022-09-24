@@ -2,11 +2,11 @@ import { toHaveStyle } from "@testing-library/jest-dom/dist/matchers";
 import React from "react";
 
 export default class EditToolbar extends React.Component {
-    handleClick = (event) => {
+    handleAddSong = (event) => {
         const {createNewSongCallback} = this.props;
         createNewSongCallback();
     }
-    
+
     render() {
         const { canAddSong, canUndo, canRedo, canClose, 
                 undoCallback, redoCallback, closeCallback} = this.props;
@@ -25,7 +25,7 @@ export default class EditToolbar extends React.Component {
                 id='add-song-button' 
                 value="+" 
                 className={addSongClass}
-                onClick={this.handleClick}
+                onClick={this.handleAddSong}
             />
             <input 
                 type="button" 
