@@ -13,16 +13,10 @@ export default class DeleteSong_Transaction extends jsTPS_Transaction {
         this.app = initApp;
         this.deleteSongIndex = index;
         this.deleteSong = null;
-        this.performingUndoRedo = false;
     }
 
     doTransaction() {
-        if(this.performingUndoRedo){
-            this.app.deleteSong(this.deleteSongIndex);
-        }else{
-            this.deleteSong = this.app.markSongForDeletion(this.deleteSongIndex);
-        }
-        this.performingUndoRedo = true;
+        this.deleteSong = this.app.deleteMarkedSong(this.deleteSongIndex);
     }
     
     undoTransaction() {

@@ -22,6 +22,7 @@ import PlaylistCards from './components/PlaylistCards.js';
 import SidebarHeading from './components/SidebarHeading.js';
 import SidebarList from './components/SidebarList.js';
 import Statusbar from './components/Statusbar.js';
+import EditSong_Transaction from './transactions/EditSong_Transaction';
 
 class App extends React.Component {
     constructor(props) {
@@ -97,21 +98,21 @@ class App extends React.Component {
 
     //CREATE NEW SONG
     createNewSong = (index, song) => {
-        if(this.state.currentList !=null){
-            let newSong = "";
+        if(this.state.currentList != null){
+            let newList = this.state.currentList;
             if(index != null && song != null){
-                this.state.currentList.songs.splice(index, 0, song)
+                newList.songs.splice(index, 0, song);
             }else{
                 //MAKE THE NEW SONG
-                newSong = {
+                let newSong = {
                     title: "Untitled",
                     artist: "Unknown",
                     youTubeId: "dQw4w9WgXcQ"
                 };
                 //CREATE A NEW LIST WITH THE CURRENT LIST OF SONGS + NEW SONG
-                this.state.currentList.songs.push(newSong);
+                newList.songs.push(newSong);
             }
-            this.setStateWithUpdatedList(this.state.currentList);
+            this.setStateWithUpdatedList(newList);
         }
     }
 
@@ -162,28 +163,6 @@ class App extends React.Component {
     deleteMarkedList = () => {
         this.deleteList(this.state.listKeyPairMarkedForDeletion.key);
         this.hideDeleteListModal();
-    }
-
-    //DELETE SONG
-    deleteSong = (deleteSongIndex) => {
-        let newList = this.state.currentList;
-        newList.songs.splice(deleteSongIndex, 1);
-        
-        this.setState(prevState => ({
-            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
-            currentList : newList,
-            sessionData : this.state.sessionData,
-            songIndexMarkedForDeletion: null
-        }), () => {
-            // UPDATING THE LIST IN PERMANENT STORAGE
-            // IS AN AFTER EFFECT
-            this.db.mutationUpdateList(this.state.currentList);
-        });
-    }
-
-    deleteMarkedSong = () => {
-        this.deleteSong(this.state.songIndexMarkedForDeletion);
-        this.hideDeleteSongModal();
     }
 
     // THIS FUNCTION SPECIFICALLY DELETES THE CURRENT LIST
@@ -355,8 +334,40 @@ class App extends React.Component {
     }
 
     addDeleteSongTransaction = (index) => {
-        let transaction = new DeleteSong_Transaction(this, index);
-        this.tps.addTransaction(transaction);
+        if(this.state.songIndexMarkedForDeletion != null){
+            let newIndex = this.state.songIndexMarkedForDeletion
+            let transaction = new DeleteSong_Transaction(this, newIndex);
+            this.tps.addTransaction(transaction);
+        }
+    }
+
+     
+    deleteSong = (deleteSongIndex) => {
+        if(this.state.currentList != null){
+            let newList = this.state.currentList;
+            newList.songs.splice(deleteSongIndex, 1);
+            
+            this.setState(prevState => ({
+                listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+                currentList : newList,
+                sessionData : this.state.sessionData,
+                songIndexMarkedForDeletion: prevState.songIndexMarkedForDeletion
+            }), () => {
+                // UPDATING THE LIST IN PERMANENT STORAGE
+                // IS AN AFTER EFFECT
+                this.db.mutationUpdateList(this.state.currentList);
+            });
+        }
+        
+    }
+
+    deleteMarkedSong = (index) => {
+        if(index != null){
+            let originalDelSong = this.state.currentList.songs[index];
+            this.deleteSong(index);
+            this.hideDeleteSongModal();
+            return originalDelSong;
+        }
     }
 
     showDeleteSongModal() {
@@ -389,47 +400,59 @@ class App extends React.Component {
             songIndexMarkedForEdit: index
         }), () => {
             //PROMPT THE USER
-            let editSong = this.state.currentList.songs[index];
-            document.getElementById('edit-song-title').value = editSong.title;
-            document.getElementById('edit-song-artist').value = editSong.artist;
-            document.getElementById('edit-song-youTubeId').value = editSong.youTubeId;
             this.showEditSongModal();
-        });
+        })
+        let editSong = this.state.currentList.songs[index];
+        document.getElementById('edit-song-title').value = editSong.title;
+        document.getElementById('edit-song-artist').value = editSong.artist;
+        document.getElementById('edit-song-youTubeId').value = editSong.youTubeId;
     }
 
-    editMarkedSong = () => {
-        let newTitle = document.getElementById('edit-song-title').value;
-        let newArtist = document.getElementById('edit-song-artist').value;
-        let newYouTubeId = document.getElementById('edit-song-youTubeId').value;
-        this.editSong(this.state.songIndexMarkedForEdit, newTitle, newArtist, newYouTubeId);
-        this.hideEditSongModal();
+    addEditSongTransaction = () => {
+        if(this.state.songIndexMarkedForEdit != null){  
+            let newIndex = this.state.songIndexMarkedForEdit;
+            let newTitle = document.getElementById('edit-song-title').value;
+            let newArtist = document.getElementById('edit-song-artist').value;
+            let newYouTubeId = document.getElementById('edit-song-youTubeId').value;
 
-        //CLEAR EDIT INPUT BOXS AFTER EDITING
-        document.getElementById('edit-song-title').value = "";
-        document.getElementById('edit-song-artist').value = "";
-        document.getElementById('edit-song-youTubeId').value = "";
-    }
-
-    editSong = (index, newTitle, newArtist, newYouTubeId) => {
-        let newSong = {
-            title: newTitle,
-            artist: newArtist,
-            youTubeId: newYouTubeId
+            let transaction = new EditSong_Transaction(this, newIndex, newTitle, newArtist, newYouTubeId);
+            this.tps.addTransaction(transaction);
         }
-        this.state.currentList.songs.splice(index, 1, newSong);
+    }
 
-        //RESET SONG INDEX MARKED FOR EDIT
-        this.setState(prevState => ({
-            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
-            currentList : prevState.currentList,
-            sessionData : prevState.sessionData,
-            songIndexMarkedForDeletion: prevState.songIndexMarkedForDeletion,
-            songIndexMarkedForEdit : null
-        }), () => {
-            // UPDATING THE LIST IN PERMANENT STORAGE
-            // IS AN AFTER EFFECT
-            this.db.mutationUpdateList(this.state.currentList);
-        });
+    editMarkedSong = (index, newTitle, newArtist, newYouTubeId) => {
+            let origSong = this.state.currentList.songs[index];
+            this.editSong(index, newTitle, newArtist, newYouTubeId);
+            this.hideEditSongModal();
+
+            return origSong;
+        
+    }
+
+    
+    editSong = (index, newTitle, newArtist, newYouTubeId) => {
+        if(this.state.currentList != null){
+            let newSong = {
+                title: newTitle,
+                artist: newArtist,
+                youTubeId: newYouTubeId
+            }
+            let newList = this.state.currentList;
+            newList.songs.splice(index, 1, newSong);
+
+            //RESET SONG INDEX MARKED FOR EDIT
+            this.setState(prevState => ({
+                listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+                currentList : newList,
+                sessionData : prevState.sessionData,
+                songIndexMarkedForDeletion: prevState.songIndexMarkedForDeletion,
+                songIndexMarkedForEdit : prevState.songIndexMarkedForEdit
+            }), () => {
+                // UPDATING THE LIST IN PERMANENT STORAGE
+                // IS AN AFTER EFFECT
+                this.db.mutationUpdateList(newList);
+            });
+        }
     }
 
     showEditSongModal() {
@@ -487,7 +510,7 @@ class App extends React.Component {
                 <PlaylistCards
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction} 
-                    deleteSongCallback={this.addDeleteSongTransaction}
+                    deleteSongCallback={this.markSongForDeletion}
                     editSongCallback={this.markSongForEdit}
                 />
                 <Statusbar 
@@ -500,11 +523,12 @@ class App extends React.Component {
                 <DeleteSongModal
                     index={this.state.songIndexMarkedForDeletion}
                     currentList={this.state.currentList !== null ? this.state.currentList : null}
-                    deleteSongCallback={this.deleteMarkedSong}
+                    deleteSongCallback={this.addDeleteSongTransaction}
                     hideDeleteSongModalCallback={this.hideDeleteSongModal}
                 />
                 <EditSongModal
-                    editSongCallback={this.editMarkedSong}
+                    index = {this.state.songIndexMarkedForEdit}
+                    editSongCallback={this.addEditSongTransaction}
                     hideEditSongModalCallback={this.hideEditSongModal} 
                 />
             </div>

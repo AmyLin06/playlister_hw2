@@ -316,6 +316,12 @@ span {
   margin-top: 1rem;
 }
 
+.disabled{
+  opacity: .25px;
+  cursor: not-allowed;
+  background-color: lightgray;
+}
+
 /* ANIMATIONS
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 [data-animation] .modal-root {

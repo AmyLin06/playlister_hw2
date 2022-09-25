@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class SongModal extends Component {
+export default class EditSongModal extends Component {
     render() {
         const {editSongCallback, hideEditSongModalCallback } = this.props;
 
@@ -31,7 +31,7 @@ export default class SongModal extends Component {
                             <input type="button" 
                                 id="edit-song-confirm-button" 
                                 className="modal-button" 
-                                onClick={editSongCallback}
+                                onClick={this.props.editSongCallback}
                                 value='Confirm' />
                             <input type="button" 
                                 id="edit-song-cancel-button" 
