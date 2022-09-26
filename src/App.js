@@ -37,6 +37,9 @@ class App extends React.Component {
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
 
+        // MODAL BOX BOOLEAN
+        this.modalOpen = false;
+
         // SETUP THE INITIAL STATE
         this.state = {
             listKeyPairMarkedForDeletion : null,
@@ -231,6 +234,7 @@ class App extends React.Component {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
             this.tps.clearAllTransactions();
+            this.setState(this.state);
         });
     }
     setStateWithUpdatedList(list) {
@@ -321,6 +325,8 @@ class App extends React.Component {
     }
 
     markSongForDeletion = (index) => {
+        this.modalOpen = true;
+
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: prevState.currentList,
@@ -378,6 +384,7 @@ class App extends React.Component {
     hideDeleteSongModal = () => {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.remove("is-visible");
+        this.modalOpen = false;
 
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
@@ -392,6 +399,7 @@ class App extends React.Component {
     }
 
     markSongForEdit = (index) => {
+        this.modalOpen = true;
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: prevState.currentList,
@@ -464,6 +472,7 @@ class App extends React.Component {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
 
+        this.modalOpen = false;
         //RESET SONG INDEX MARKED FOR EDIT
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
@@ -478,17 +487,36 @@ class App extends React.Component {
         });
     }
 
+    /*disableButton = (bool) => {
+        if(document.getElementById("add-list-button") != null){
+            document.getElementById("add-list-button").disabled = bool;
+        }
+    }*/
+
+    handleCtrlZY = (event) => {
+        if(event.ctrlKey && event.key === "z"){
+            console.log("TEST FOR Z")
+            this.undo();
+        }
+        if(event.ctrlKey && event.key === "y"){
+            this.redo();
+        }
+    }
 
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
+        let canAddList = this.state.currentList == null;
+
         return (
-            <div id="root">
+            <div id="root" onKeyDown = {this.handleCtrlZY}>
                 <Banner />
                 <SidebarHeading
                     createNewListCallback={this.createNewList}
+                    canAddList={canAddList}
+                    //disableButtonCallback={this.disableButton}
                 />
                 <SidebarList
                     currentList={this.state.currentList}
@@ -498,6 +526,7 @@ class App extends React.Component {
                     renameListCallback={this.renameList}
                 />
                 <EditToolbar
+                    modalOpen={this.modalOpen}
                     canAddSong={canAddSong}
                     canUndo={canUndo}
                     canRedo={canRedo}
