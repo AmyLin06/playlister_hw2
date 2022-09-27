@@ -3,21 +3,41 @@ import React from "react";
 
 export default class EditToolbar extends React.Component {
     handleAddSong = (event) => {
-        const {createNewSongCallback} = this.props;
-        createNewSongCallback();
+        if(this.props.canAddSong && !this.props.modalOpen){
+            const {createNewSongCallback} = this.props;
+            createNewSongCallback();
+        }
+    }
+
+    handleUndo = (event) => {
+        if(this.props.canUndo && !this.props.modalOpen){
+            this.props.undoCallback();
+        }
+    }
+
+    handleRedo = (event) => {
+        if(this.props.canRedo && !this.props.modalOpen){
+            this.props.redoCallback();
+        }
+    }
+
+    handleClose = (event) => {
+        if(this.props.canClose && !this.props.modalOpen){
+            this.props.closeCallback();
+        }
     }
 
     render() {
         const { modalOpen, canAddSong, canUndo, canRedo, canClose, 
-                undoCallback, redoCallback, closeCallback} = this.props;
-        let addSongClass = "toolbar-button";
-        let undoClass = "toolbar-button";
-        let redoClass = "toolbar-button";
-        let closeClass = "toolbar-button";
-        if (!canAddSong || modalOpen) addSongClass += " disabled";
-        if (!canUndo || modalOpen) undoClass += " disabled";
-        if (!canRedo || modalOpen) redoClass += " disabled";
-        if (!canClose || modalOpen) closeClass += " disabled";
+                undoCallback, redoCallback, closeCallback, listEditActive} = this.props;
+        let addSongClass = "playlister-button";
+        let undoClass = "playlister-button";
+        let redoClass = "playlister-button";
+        let closeClass = "playlister-button";
+        if (!canAddSong || modalOpen) addSongClass += " playlister-button-disabled";
+        if (!canUndo || modalOpen ) undoClass += " playlister-button-disabled";
+        if (!canRedo || modalOpen) redoClass += " playlister-button-disabled";
+        if (!canClose || modalOpen) closeClass += " playlister-button-disabled";
         return (
             <div id="edit-toolbar">
             <input 
@@ -32,21 +52,21 @@ export default class EditToolbar extends React.Component {
                 id='undo-button' 
                 value="⟲" 
                 className={undoClass} 
-                onClick={undoCallback}
+                onClick={this.handleUndo}
             />
             <input 
                 type="button" 
                 id='redo-button' 
                 value="⟳" 
                 className={redoClass} 
-                onClick={redoCallback}
+                onClick={this.handleRedo}
             />
             <input 
                 type="button" 
                 id='close-button' 
                 value="&#x2715;" 
                 className={closeClass} 
-                onClick={closeCallback}
+                onClick={this.handleClose}
             />
         </div>
         )

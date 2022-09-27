@@ -40,6 +40,9 @@ class App extends React.Component {
         // MODAL BOX BOOLEAN
         this.modalOpen = false;
 
+        //LIST EDIT ACTIVE
+        //this.listEditActive = false;
+
         // SETUP THE INITIAL STATE
         this.state = {
             listKeyPairMarkedForDeletion : null,
@@ -495,7 +498,6 @@ class App extends React.Component {
 
     handleCtrlZY = (event) => {
         if(event.ctrlKey && event.key === "z"){
-            console.log("TEST FOR Z")
             this.undo();
         }
         if(event.ctrlKey && event.key === "y"){
@@ -503,13 +505,23 @@ class App extends React.Component {
         }
     }
 
+    // disableEditToolbar = () => {
+    //     this.modalOpen = true;
+    //     this.setState(this.state);
+    // }
+
+    // enableEditToolbar = () => {
+    //     this.modalOpen = false;
+    //     this.setState(this.state);
+    // }
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
         let canAddList = this.state.currentList == null;
-
+        
         return (
             <div id="root" onKeyDown = {this.handleCtrlZY}>
                 <Banner />
@@ -524,9 +536,12 @@ class App extends React.Component {
                     deleteListCallback={this.markListForDeletion}
                     loadListCallback={this.loadList}
                     renameListCallback={this.renameList}
+                    // editActiveCallback={this.disableEditToolbar}
+                    // editNotActiveCallback={this.enableEditToolbar}
                 />
                 <EditToolbar
                     modalOpen={this.modalOpen}
+                    //listEditActive={this.listEditActive}
                     canAddSong={canAddSong}
                     canUndo={canUndo}
                     canRedo={canRedo}

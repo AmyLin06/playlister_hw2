@@ -9,12 +9,18 @@ export default class ListCard extends React.Component {
             editActive: false,
         }
     }
+    
     handleClick = (event) => {
         if (event.detail === 1) {
             this.handleLoadList(event);
         }
         else if (event.detail === 2) {
+            //document.getElementById("add-song-button").disabled = true;
+            //document.getElementById("undo-button").disabled = true;
+            //document.getElementById("redo-button").disabled = true;
+            //document.getElementById("close-button").disabled = true;
             this.handleToggleEdit(event);
+            // this.props.editActiveCallback();
         }
     }
     handleLoadList = (event) => {
@@ -32,6 +38,7 @@ export default class ListCard extends React.Component {
         this.setState({
             editActive: !this.state.editActive
         });
+        //this.props.listEditActive(this.state.editActive);
     }
     handleUpdate = (event) => {
         this.setState({ text: event.target.value });
@@ -46,7 +53,12 @@ export default class ListCard extends React.Component {
         let textValue = this.state.text;
         console.log("ListCard handleBlur: " + textValue);
         this.props.renameListCallback(key, textValue);
+        //document.getElementById("add-song-button").disabled = false;
+        //document.getElementById("undo-button").disabled = false;
+        //document.getElementById("redo-button").disabled = false;
+        //document.getElementById("close-button").disabled = false;
         this.handleToggleEdit();
+        // this.props.editNotActiveCallback();
     }
 
     render() {

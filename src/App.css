@@ -319,7 +319,7 @@ span {
 .disabled{
   opacity: .25px;
   cursor: not-allowed;
-  background-color: lightgray;
+  
 }
 
 /* ANIMATIONS
