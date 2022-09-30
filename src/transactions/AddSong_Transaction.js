@@ -11,7 +11,9 @@ export default class AddSong_Transaction extends jsTPS_Transaction {
     constructor(initApp, list) {
         super();
         this.app = initApp;
-        this.currentList = list
+        console.log(list);
+        this.currentList = list;
+        this.index = this.app.state.currentList.songs.length;
     }
 
     doTransaction() {
@@ -19,6 +21,7 @@ export default class AddSong_Transaction extends jsTPS_Transaction {
     }
     
     undoTransaction() {
-        this.app.deleteSong(this.currentList.songs.length - 1);
+        console.log("length" + this.index);
+        this.app.deleteSong(this.index);
     }
 }

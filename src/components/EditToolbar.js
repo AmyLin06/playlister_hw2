@@ -9,12 +9,6 @@ export default class EditToolbar extends React.Component {
         }
     }
 
-    handleUndo = (event) => {
-        if(this.props.canUndo && !this.props.modalOpen){
-            this.props.undoCallback();
-        }
-    }
-
     handleRedo = (event) => {
         if(this.props.canRedo && !this.props.modalOpen){
             this.props.redoCallback();
@@ -52,7 +46,8 @@ export default class EditToolbar extends React.Component {
                 id='undo-button' 
                 value="⟲" 
                 className={undoClass} 
-                onClick={this.handleUndo}
+                disabled={!canUndo || modalOpen}
+                onClick={undoCallback}
             />
             <input 
                 type="button" 

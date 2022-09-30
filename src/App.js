@@ -178,6 +178,7 @@ class App extends React.Component {
         }
     }
     renameList = (key, newName) => {
+        console.log("renameList UNDOcheck " + this.tps.hasTransactionToUndo());
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
         // NOW GO THROUGH THE ARRAY AND FIND THE ONE TO RENAME
         for (let i = 0; i < newKeyNamePairs.length; i++) {
@@ -193,15 +194,16 @@ class App extends React.Component {
         if (currentList.key === key) {
             currentList.name = newName;
         }
-
+        
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : null,
             sessionData: {
                 nextKey: prevState.sessionData.nextKey,
                 counter: prevState.sessionData.counter,
                 keyNamePairs: newKeyNamePairs
-
+            
             },
+            currentList: currentList,
             songIndexMarkedForDeletion: prevState.songIndexMarkedForDeletion
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
@@ -214,7 +216,18 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
+        console.log("Loadlist TEST" + key);
+        console.log("event1 undo test before" + this.tps.hasTransactionToUndo());
+
         let newCurrentList = this.db.queryGetList(key);
+        //console.log(key);
+        //console.log("Key" + this.state.currentList.key);
+        //console.log(this.state.currentList.key === key);
+        if(this.state.currentList === null || !(this.state.currentList.key == key)){
+            console.log("new list reached");
+            this.tps.clearAllTransactions();
+        }
+
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: newCurrentList,
@@ -223,11 +236,13 @@ class App extends React.Component {
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
-            this.tps.clearAllTransactions();
+            // this.tps.clearAllTransactions();
         });
+        console.log("event1 undo test after" + this.tps.hasTransactionToUndo());
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
+        console.log("close TEST")
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: null,
@@ -518,6 +533,7 @@ class App extends React.Component {
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
+        console.log("Render UNDO" , this.tps.hasTransactionToUndo())
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
         let canAddList = this.state.currentList == null;

@@ -12,9 +12,11 @@ export default class ListCard extends React.Component {
     
     handleClick = (event) => {
         if (event.detail === 1) {
+            console.log("Listcard event.detail === 1");
             this.handleLoadList(event);
         }
         else if (event.detail === 2) {
+            console.log("Listcard event.detail === 2");
             //document.getElementById("add-song-button").disabled = true;
             //document.getElementById("undo-button").disabled = true;
             //document.getElementById("redo-button").disabled = true;
@@ -53,10 +55,6 @@ export default class ListCard extends React.Component {
         let textValue = this.state.text;
         console.log("ListCard handleBlur: " + textValue);
         this.props.renameListCallback(key, textValue);
-        //document.getElementById("add-song-button").disabled = false;
-        //document.getElementById("undo-button").disabled = false;
-        //document.getElementById("redo-button").disabled = false;
-        //document.getElementById("close-button").disabled = false;
         this.handleToggleEdit();
         // this.props.editNotActiveCallback();
     }
